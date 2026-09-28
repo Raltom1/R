@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Portfolio Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{ min-height:100vh; }
+  .admin-shell{ max-width:1100px; margin:0 auto; padding:40px 24px 80px; }
+  .admin-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+  .admin-header h1{ font-size:1.5rem; }
+  .logout-btn{ background:var(--panel); border:1px solid var(--panel-border); color:var(--text-1); padding:9px 18px; border-radius:999px; font-size:0.85rem; cursor:pointer; }
+  .logout-btn:hover{ background:rgba(255,255,255,0.08); color:var(--text-0); }
+
+  /* Login */
+  .login-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .login-card{ width:100%; max-width:380px; background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius-lg); padding:36px; }
+  .login-card h1{ font-size:1.3rem; margin-bottom:6px; }
+  .login-card p{ color:var(--text-2); font-size:0.85rem; margin-bottom:24px; }
+  .login-card .field{ margin-bottom:14px; }
+  .login-card .btn{ width:100%; justify-content:center; margin-top:8px; }
+  .login-err{ color:#f87171; font-size:0.85rem; min-height:18px; margin-top:10px; }
+
+  /* Tabs */
+  .tab-bar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+  .tab-btn{ padding:10px 18px; border-radius:999px; background:var(--panel); border:1px solid var(--panel-border); color:var(--text-1); font-size:0.86rem; cursor:pointer; }
+  .tab-btn.active{ background:linear-gradient(135deg, var(--violet), var(--pink)); color:#fff; border-color:transparent; }
+  .tab-panel{ display:none; background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius-lg); padding:28px; }
+  .tab-panel.active{ display:block; }
+  .tab-panel h2{ font-size:1.1rem; margin-bottom:18px; }
+
+  .save-row{ display:flex; align-items:center; gap:14px; margin-top:20px; }
+  .save-status{ font-size:0.84rem; color:var(--text-2); }
+  .save-status.ok{ color:#34d399; }
+  .save-status.err{ color:#f87171; }
+
+  /* Project list editor */
+  .project-editor{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:18px; margin-bottom:16px; }
+  .project-editor .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .project-editor .field-grid .field.full{ grid-column:1/-1; }
+  .row-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+  .btn-danger{ background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.35); color:#f87171; padding:9px 16px; border-radius:999px; font-size:0.82rem; cursor:pointer; }
+  .btn-add{ background:transparent; border:1px dashed var(--panel-border); color:var(--text-1); padding:12px; width:100%; border-radius:var(--radius-md); cursor:pointer; font-size:0.88rem; }
+  .btn-add:hover{ border-color:var(--violet-soft); color:var(--text-0); }
+
+  /* Notification UI */
+  .toast-container{ position:fixed; top:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:50; }
+  .toast{ min-width:240px; max-width:360px; padding:12px 16px; border-radius:12px; background:rgba(13,18,35,0.96); border:1px solid var(--panel-border); color:var(--text-0); box-shadow:0 18px 40px rgba(0,0,0,0.32); opacity:0; transform:translateY(-10px); transition:all 0.22s ease; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+  .toast.success{ border-color:rgba(52,211,153,0.5); color:#d1fae5; }
+  .toast.error{ border-color:rgba(248,113,113,0.5); color:#fecaca; }
+  .toast.warning{ border-color:rgba(250,204,21,0.5); color:#fef3c7; }
+
+  .confirm-modal{ position:fixed; inset:0; background:rgba(3,7,18,0.72); display:flex; align-items:center; justify-content:center; padding:24px; z-index:60; }
+  .confirm-modal.hidden{ display:none; }
+  .confirm-card{ width:min(420px, 100%); background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius-lg); padding:24px; box-shadow:0 30px 80px rgba(0,0,0,0.4); }
+  .confirm-card h3{ margin:0 0 8px; font-size:1.1rem; }
+  .confirm-card p{ margin:0 0 20px; color:var(--text-2); line-height:1.6; }
+  .confirm-actions{ display:flex; justify-content:flex-end; gap:10px; }
+
+  /* Skills editor */
+  .skill-cat{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:16px; margin-bottom:14px; }
+  .skill-cat-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .skill-cat-head input{ background:transparent; border:none; color:var(--text-0); font-family:var(--font-head); font-size:1rem; font-weight:700; width:60%; }
+  .skill-tag-list{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .skill-tag{ display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid var(--panel-border); border-radius:999px; padding:6px 6px 6px 12px; font-size:0.8rem; }
+  .skill-tag button{ background:transparent; border:none; color:var(--text-2); cursor:pointer; font-size:0.9rem; }
+  .skill-add-row{ display:flex; gap:8px; }
+  .skill-add-row input{ flex:1; }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN VIEW ================= -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <h1>Admin Login</h1>
+    <p>Sign in to edit the portfolio content.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="lg-user">Username</label>
+        <input type="text" id="lg-user" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="lg-pass">Password</label>
+        <input type="password" id="lg-pass" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Log In</button>
+      <div class="login-err" id="loginErr"></div>
+    </form>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<div id="confirmModal" class="confirm-modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-card">
+    <h3 id="confirmTitle">Confirm action</h3>
+    <p id="confirmMessage">Are you sure?</p>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" id="confirmCancelBtn">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmOkBtn">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD VIEW ================= -->
+<div class="admin-shell" id="dashboardView" style="display:none;">
+  <div class="admin-header">
+    <h1>Portfolio Settings</h1>
+    <button class="logout-btn" id="logoutBtn">Log Out</button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="about">About</button>
+    <button class="tab-btn" data-tab="projects">Projects</button>
+    <button class="tab-btn" data-tab="skills">Skills</button>
+    <button class="tab-btn" data-tab="contact">Contact</button>
+    <button class="tab-btn" data-tab="footer">Footer</button>
+    <button class="tab-btn" data-tab="messages">Messages</button>
+  </div>
+
+  <!-- About -->
+  <div class="tab-panel active" data-panel="about">
+    <h2>About Section</h2>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Short intro (hero paragraph)</label>
+      <textarea id="s-about_bio" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label>Longer bio (About section detail)</label>
+      <textarea id="s-about_long" rows="4"></textarea>
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="about">Save Changes</button>
+      <span class="save-status" id="status-about"></span>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="tab-panel" data-panel="projects">
+    <h2>Projects</h2>
+    <div id="projectList"></div>
+    <button class="btn-add" id="addProjectBtn">+ Add Project</button>
+  </div>
+
+  <!-- Skills -->
+  <div class="tab-panel" data-panel="skills">
+    <h2>Skills</h2>
+    <div id="skillCatList"></div>
+    <button class="btn-add" id="addCategoryBtn">+ Add Category</button>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="skills">Save Skills</button>
+      <span class="save-status" id="status-skills"></span>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="tab-panel" data-panel="contact">
+    <h2>Contact Section</h2>
+    <div class="field-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div class="field"><label>Email</label><input type="email" id="s-contact_email"></div>
+      <div class="field"><label>Phone</label><input type="text" id="s-contact_phone"></div>
+      <div class="field"><label>Facebook URL</label><input type="url" id="s-contact_facebook"></div>
+      <div class="field"><label>Instagram URL</label><input type="url" id="s-contact_instagram"></div>
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="contact">Save Changes</button>
+      <span class="save-status" id="status-contact"></span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="tab-panel" data-panel="footer">
+    <h2>Footer</h2>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Name</label>
+      <input type="text" id="s-footer_name">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Tagline</label>
+      <input type="text" id="s-footer_tagline">
+    </div>
+    <div class="field">
+      <label>Copyright year</label>
+      <input type="text" id="s-footer_year">
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="footer">Save Changes</button>
+      <span class="save-status" id="status-footer"></span>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="tab-panel" data-panel="messages">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
+      <h2 style="margin:0;">Messages from Contact Form</h2>
+      <button id="clearInboxBtn" class="btn btn-ghost" type="button" style="padding:10px 18px; font-size:0.8rem;">Clear Inbox</button>
+    </div>
+    <div id="messagesList" style="color:var(--text-2); font-size:0.9rem;">Loading…</div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
