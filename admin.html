@@ -1,307 +1,300 @@
-/* ===================================================================
-   Public site script
-   - Pulls editable content from the Google Sheet (via Apps Script API)
-   - Falls back to the static markup already in index.html if the
-     backend isn't configured yet or a fetch fails
-=================================================================== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reign Kerstine Balagtas — System Analyst &amp; UI/UX Enthusiast</title>
+<meta name="description" content="Portfolio of Reign Kerstine A. Balagtas — IT graduate, System Analyst, and UI/UX enthusiast.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-(function () {
-  "use strict";
+<!-- ================= NAV ================= -->
+<div class="nav-shell" id="navShell">
+  <div class="nav-inner">
+    <a href="#home" class="brand">
+      <span class="brand-mark">RK</span>
+      <span>Reign Kerstine<small>SYSTEM ANALYST &amp; UI/UX</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <a href="#contact" class="nav-cta">Let's Connect</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
-  const backendReady = typeof APPS_SCRIPT_URL === "string" &&
-    APPS_SCRIPT_URL.startsWith("http");
+<!-- ================= HERO / ABOUT ================= -->
+<section id="home" class="hero wrap scroll-reveal">
+  <div class="hero-copy">
+    <span class="eyebrow">IT GRADUATE · SYSTEM ANALYST</span>
+    <h1>I turn requirements<br>into systems people <em>actually enjoy using.</em></h1>
+    <p class="lede" id="aboutBio" data-field="about_bio">
+      I'm an IT graduate with an interest in System Analysis, UI/UX Design, and Web Development.
+      I enjoy turning ideas and requirements into organized, user-friendly, and functional systems —
+      from workflow design and documentation to interface design and quality assurance.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-primary">View My Work →</a>
+      <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+    </div>
+    <div class="hero-stats">
+      <div><strong>2+</strong><span>System &amp; QA projects</span></div>
+      <div><strong>5</strong><span>Skill disciplines</span></div>
+      <div><strong>1</strong><span>Internship completed</span></div>
+    </div>
+    <div class="badge-dot"><i></i> Open to new opportunities</div>
+  </div>
 
-  /* ---------------- Nav ---------------- */
-  const navShell = document.getElementById("navShell");
-  const navToggle = document.getElementById("navToggle");
-  const navLinks = document.getElementById("navLinks");
+  <div class="hero-visual">
+    <div class="orb"></div>
+    <div class="orb-ring"></div>
+    <div class="orb-ring ring-2"></div>
+    <div class="float-card fc-top">
+      <strong>Requirements</strong>
+      <span>Gathering &amp; analysis</span>
+    </div>
+    <div class="float-card fc-mid">
+      <strong>UI/UX Design</strong>
+      <span>Figma prototypes</span>
+    </div>
+    <div class="float-card fc-bottom">
+      <strong>QA Testing</strong>
+      <span>Test cases &amp; fixes</span>
+    </div>
+  </div>
+</section>
 
-  window.addEventListener("scroll", () => {
-    navShell.classList.toggle("scrolled", window.scrollY > 12);
-  });
+<!-- ================= ABOUT DETAIL ================= -->
+<section id="about" class="wrap scroll-reveal">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">ABOUT ME</span>
+      <h2>Hi, I'm Reign Kerstine.</h2>
+    </div>
+    <p>Always open to learning new technologies, improving my skills, and taking on new challenges in the IT field.</p>
+  </div>
 
-  navToggle.addEventListener("click", () => {
-    navLinks.classList.toggle("open");
-  });
+  <div class="about-grid">
+    <div class="about-card reveal">
+      <span class="eyebrow">FOCUS AREAS</span>
+      <div class="chip-row">
+        <span class="chip">System Analysis</span>
+        <span class="chip">UI/UX Design</span>
+        <span class="chip">Web Development</span>
+        <span class="chip">Quality Assurance</span>
+        <span class="chip">Documentation</span>
+      </div>
+    </div>
+    <div class="about-card reveal">
+      <p id="aboutLong" data-field="about_long">
+        I have experience working on system requirements, workflow design, UI design, quality assurance,
+        documentation, and data analysis. Through my academic project and internship experience,
+        I've also worked closely with developers to build and test web-based systems.
+      </p>
+    </div>
+  </div>
+</section>
 
-  navLinks.querySelectorAll("a").forEach((a) => {
-    a.addEventListener("click", () => navLinks.classList.remove("open"));
-  });
+<!-- ================= PROJECTS ================= -->
+<section id="projects" class="wrap scroll-reveal">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">FEATURED WORK</span>
+      <h2>Projects I've helped bring to life.</h2>
+    </div>
+    <p>System analysis, UI design, and QA work across academic and internship projects.</p>
+  </div>
 
-  /* ---------------- Reveal on scroll ---------------- */
-  const revealEls = document.querySelectorAll(".reveal, .scroll-reveal");
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          if (entry.target.classList.contains("reveal")) {
-            entry.target.style.animationDelay = (i % 4) * 0.1 + "s";
-          }
-          entry.target.classList.add("is-visible");
-          io.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.15 }
-  );
-  revealEls.forEach((el) => io.observe(el));
+  <div class="project-grid" id="projectGrid">
+    <!-- Rendered by script.js from Google Sheet data; fallback markup below -->
+    <article class="project-card reveal">
+      <div class="project-media">
+        <div class="placeholder">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Image set by admin</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-role">SYSTEM ANALYST</div>
+        <h3>SmartSK — Project Monitoring System</h3>
+        <p>A web-based project monitoring system focused on budgeting, project tracking, and forecasting for the Sangguniang Kabataan.</p>
+        <div class="tag-row">
+          <span class="tag">Requirements</span>
+          <span class="tag">UI Design</span>
+          <span class="tag">Documentation</span>
+        </div>
+      </div>
+    </article>
 
-  /* ---------------- Fetch content from the sheet ---------------- */
-  async function loadContent() {
-    if (!backendReady) return;
-    try {
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=getContent`);
-      const data = await res.json();
-      if (!data || data.success === false) return;
-      applySettings(data.settings || {});
-      if (Array.isArray(data.projects) && data.projects.length) {
-        renderProjects(data.projects);
-      }
-      if (data.skills && Object.keys(data.skills).length) {
-        renderSkills(data.skills);
-      }
-    } catch (err) {
-      // Silently keep the static fallback content already in the page.
-      console.warn("Portfolio content fetch failed, showing fallback content.", err);
-    }
-  }
+    <article class="project-card reveal">
+      <div class="project-media">
+        <div class="placeholder">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Image set by admin</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-role">SYSTEM ANALYST &amp; QA INTERN — MATIMCO INC.</div>
+        <h3>Daily Time Record (DTR) Management System</h3>
+        <p>A web-based DTR management system developed during my internship to support employee time-record management.</p>
+        <div class="tag-row">
+          <span class="tag">UI &amp; Workflow</span>
+          <span class="tag">Test Cases</span>
+          <span class="tag">Bug Verification</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
 
-  function applySettings(s) {
-    setText("aboutBio", s.about_bio);
-    setText("aboutLong", s.about_long);
-    setText("contactEmail", s.contact_email);
-    setText("contactPhone", s.contact_phone);
-    setText("footerName", s.footer_name);
-    setText("footerTagline", s.footer_tagline);
+<!-- ================= SKILLS ================= -->
+<section id="skills" class="wrap scroll-reveal">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">SKILLS</span>
+      <h2>What I bring to a project.</h2>
+    </div>
+    <p>Grouped by discipline — from analysis to design to quality assurance.</p>
+  </div>
 
-    if (s.footer_year) {
-      setText("footerCopy", `© ${s.footer_year} ${s.footer_name || "Reign Kerstine A. Balagtas"}. All Rights Reserved.`);
-    }
+  <div class="skills-grid" id="skillsGrid">
+    <div class="skill-card reveal">
+      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.2 7.3L11 15.8M15.8 7.3L13 15.8M8.5 6H15.5"/></svg></div>
+      <h4>System Analysis</h4>
+      <ul>
+        <li>Requirements Gathering</li>
+        <li>System Evaluation</li>
+        <li>Workflow Design</li>
+        <li>Technical Documentation</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18h1.5a2 2 0 001.9-2.6 1.7 1.7 0 011.6-2.4H18a3 3 0 003-3 9 9 0 00-9-10z"/><circle cx="7.5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1.1" fill="currentColor" stroke="none"/></svg></div>
+      <h4>UI/UX &amp; Design</h4>
+      <ul>
+        <li>UI Design</li>
+        <li>Basic Frontend Design</li>
+        <li>Figma</li>
+        <li>Presentation Design</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12.3l2 2 4-4.3"/></svg></div>
+      <h4>Quality Assurance</h4>
+      <ul>
+        <li>Test Case Creation</li>
+        <li>Functional Testing</li>
+        <li>Bug Identification &amp; Documentation</li>
+        <li>Fix Verification</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/><line x1="3" y1="20" x2="21" y2="20"/></svg></div>
+      <h4>Data &amp; Productivity</h4>
+      <ul>
+        <li>Data Analysis &amp; Organization</li>
+        <li>Microsoft Word</li>
+        <li>Microsoft Excel</li>
+        <li>Microsoft PowerPoint</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal" style="grid-column: span 2;">
+      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="0.9" fill="currentColor" stroke="none"/></svg></div>
+      <h4>Other</h4>
+      <ul>
+        <li>Cybersecurity Fundamentals</li>
+        <li>Risk Awareness</li>
+        <li>Teamwork</li>
+        <li>Communication</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-    if (s.contact_email) {
-      const mail = `mailto:${s.contact_email}`;
-      setHref("footerEmail", mail);
-      const emailSocial = document.querySelector('.social-row a[aria-label="Email"]');
-      if (emailSocial) emailSocial.href = mail;
-    }
-    if (s.contact_facebook) {
-      setHref("fbLink", s.contact_facebook);
-      setHref("footerFb", s.contact_facebook);
-    }
-    if (s.contact_instagram) {
-      setHref("igLink", s.contact_instagram);
-      setHref("footerIg", s.contact_instagram);
-    }
-  }
+<div class="image-lightbox" id="imageLightbox" aria-hidden="true" role="dialog" aria-modal="true">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close fullscreen image">×</button>
+  <div class="lightbox-content">
+    <img id="lightboxImage" src="" alt="">
+  </div>
+</div>
 
-  function setText(id, value) {
-    if (!value) return;
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  }
-  function setHref(id, value) {
-    if (!value) return;
-    const el = document.getElementById(id);
-    if (el) el.href = value;
-  }
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="wrap scroll-reveal">
+  <div class="contact-panel reveal">
+    <div class="contact-info">
+      <span class="eyebrow">LET'S WORK TOGETHER</span>
+      <h2>Have a project, opportunity, or just want to connect?</h2>
+      <p>Feel free to reach out. I'm always open to new opportunities, collaborations, and learning experiences.</p>
 
-  /* ---------------- Render projects ---------------- */
-  const imageLightbox = document.getElementById("imageLightbox");
-  const lightboxImage = document.getElementById("lightboxImage");
-  const lightboxClose = document.getElementById("lightboxClose");
+      <div class="contact-line"><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span> <span id="contactEmail">balagtasreignkerstine@gmail.com</span></div>
+      <div class="contact-line"><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1.2 1.2 0 011.2-.3c1.2.4 2.5.6 3.8.6.7 0 1.2.5 1.2 1.2V20c0 .7-.5 1.2-1.2 1.2C11.2 21.2 2.8 12.8 2.8 3.6c0-.7.5-1.2 1.2-1.2h3.3c.7 0 1.2.5 1.2 1.2 0 1.3.2 2.6.6 3.8.1.4 0 .9-.3 1.2L6.6 10.8z"/></svg></span> <span id="contactPhone">+63 993 568 9386</span></div>
 
-  function openLightbox(src, alt) {
-    if (!imageLightbox || !lightboxImage) return;
-    lightboxImage.src = src;
-    lightboxImage.alt = alt || "Project image";
-    imageLightbox.classList.add("is-open");
-    imageLightbox.setAttribute("aria-hidden", "false");
-    document.body.classList.add("lightbox-open");
-  }
+      <div class="social-row" id="socialRow">
+        <a href="mailto:balagtasreignkerstine@gmail.com" aria-label="Email">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        </a>
+        <a href="https://www.facebook.com/rk.balagtas" id="fbLink" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 8.5h2V5.2c-.3 0-1.5-.2-2.8-.2-2.8 0-4.7 1.7-4.7 4.9v2.6H6.8V16h2.7v8h3.3v-8h2.7l.4-3.5h-3.1V10c0-1 .3-1.5 1.2-1.5z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/arkeycs/" id="igLink" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </div>
+    </div>
 
-  function closeLightbox() {
-    if (!imageLightbox || !lightboxImage) return;
-    imageLightbox.classList.remove("is-open");
-    imageLightbox.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("lightbox-open");
-    lightboxImage.removeAttribute("src");
-    lightboxImage.alt = "";
-  }
+    <form class="contact-form" id="contactForm">
+      <div class="form-row">
+        <div class="field">
+          <label for="cf-name">Your name</label>
+          <input type="text" id="cf-name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="cf-email">Your email</label>
+          <input type="email" id="cf-email" name="email" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cf-message">Tell me about your project</label>
+        <textarea id="cf-message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" id="cf-submit">Send Message →</button>
+      <div class="form-msg" id="cf-msg"></div>
+    </form>
+  </div>
+</section>
 
-  if (imageLightbox && lightboxClose) {
-    lightboxClose.addEventListener("click", closeLightbox);
-    imageLightbox.addEventListener("click", (event) => {
-      if (event.target === imageLightbox) closeLightbox();
-    });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && imageLightbox.classList.contains("is-open")) {
-        closeLightbox();
-      }
-    });
-  }
+<!-- ================= FOOTER ================= -->
+<footer class="scroll-reveal">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <strong id="footerName">Reign Kerstine A. Balagtas</strong>
+        <span id="footerTagline">IT Graduate | System Analyst | UI/UX Enthusiast</span>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/rk.balagtas" id="footerFb">Facebook</a>
+        <span>•</span>
+        <a href="https://www.instagram.com/arkeycs/" id="footerIg">Instagram</a>
+        <span>•</span>
+        <a href="mailto:balagtasreignkerstine@gmail.com" id="footerEmail">Email</a>
+      </div>
+    </div>
+    <div class="footer-copy" id="footerCopy">© 2026 Reign Kerstine A. Balagtas. All Rights Reserved.</div>
+  </div>
+</footer>
 
-  function renderProjects(projects) {
-    const grid = document.getElementById("projectGrid");
-    grid.innerHTML = "";
-    projects
-      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
-      .forEach((p) => {
-        const card = document.createElement("article");
-        card.className = "project-card reveal";
-
-        const media = p.image
-          ? `<div class="project-media is-loading">
-               <div class="media-loader skeleton"></div>
-               <img class="project-image" src="${escapeAttr(p.image)}" alt="${escapeAttr(p.title || "Project image")}" loading="lazy" style="opacity:0;">
-             </div>`
-          : `<div class="project-media">
-               <div class="placeholder">
-                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                 <span>Image set by admin</span>
-               </div>
-             </div>`;
-
-        const tags = (p.tags || "")
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean)
-          .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
-          .join("");
-
-        const roleLine = [p.role, p.company].filter(Boolean).join(" — ");
-
-        card.innerHTML = `
-          ${media}
-          <div class="project-body">
-            ${roleLine ? `<div class="project-role">${escapeHtml(roleLine.toUpperCase())}</div>` : ""}
-            <h3>${escapeHtml(p.title || "")}</h3>
-            <p>${escapeHtml(p.description || "")}</p>
-            <div class="tag-row">${tags}</div>
-          </div>`;
-
-        const projectImage = card.querySelector(".project-image");
-        const mediaLoader = card.querySelector(".media-loader");
-        if (projectImage && mediaLoader) {
-          projectImage.addEventListener("load", () => {
-            projectImage.style.opacity = "1";
-            projectImage.style.transition = "opacity 0.35s ease";
-            mediaLoader.style.opacity = "0";
-            setTimeout(() => mediaLoader.remove(), 220);
-            card.querySelector(".project-media")?.classList.remove("is-loading");
-          });
-
-          projectImage.addEventListener("click", () => {
-            openLightbox(projectImage.src, projectImage.alt || p.title || "Project image");
-          });
-
-          projectImage.addEventListener("error", () => {
-            mediaLoader.remove();
-            const media = card.querySelector(".project-media");
-            if (media) {
-              media.classList.remove("is-loading");
-              media.innerHTML = `
-                <div class="placeholder">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                  <span>Image unavailable</span>
-                </div>
-              `;
-            }
-          });
-        }
-
-        grid.appendChild(card);
-        io.observe(card);
-      });
-  }
-
-  /* ---------------- Render skills ---------------- */
-  const SVG_NS = "0 0 24 24";
-  const ICONS = {
-    "System Analysis":
-      '<svg width="20" height="20" viewBox="' + SVG_NS + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.2 7.3L11 15.8M15.8 7.3L13 15.8M8.5 6H15.5"/></svg>',
-    "UI/UX & Design":
-      '<svg width="20" height="20" viewBox="' + SVG_NS + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18h1.5a2 2 0 001.9-2.6 1.7 1.7 0 011.6-2.4H18a3 3 0 003-3 9 9 0 00-9-10z"/><circle cx="7.5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1.1" fill="currentColor" stroke="none"/></svg>',
-    "Quality Assurance":
-      '<svg width="20" height="20" viewBox="' + SVG_NS + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12.3l2 2 4-4.3"/></svg>',
-    "Data & Productivity":
-      '<svg width="20" height="20" viewBox="' + SVG_NS + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/><line x1="3" y1="20" x2="21" y2="20"/></svg>',
-    "Other":
-      '<svg width="20" height="20" viewBox="' + SVG_NS + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="0.9" fill="currentColor" stroke="none"/></svg>',
-  };
-  const DEFAULT_ICON =
-    '<svg width="20" height="20" viewBox="' + SVG_NS + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/></svg>';
-
-  function renderSkills(groups) {
-    const grid = document.getElementById("skillsGrid");
-    grid.innerHTML = "";
-    Object.keys(groups).forEach((category) => {
-      const card = document.createElement("div");
-      card.className = "skill-card reveal";
-      const items = groups[category]
-        .map((s) => `<li>${escapeHtml(s)}</li>`)
-        .join("");
-      card.innerHTML = `
-        <div class="skill-icon">${ICONS[category] || DEFAULT_ICON}</div>
-        <h4>${escapeHtml(category)}</h4>
-        <ul>${items}</ul>`;
-      grid.appendChild(card);
-      io.observe(card);
-    });
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  }
-  function escapeAttr(str) {
-    return escapeHtml(str).replace(/"/g, "&quot;");
-  }
-
-  /* ---------------- Contact form ---------------- */
-  const form = document.getElementById("contactForm");
-  const msgEl = document.getElementById("cf-msg");
-  const submitBtn = document.getElementById("cf-submit");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msgEl.textContent = "";
-    msgEl.className = "form-msg";
-
-    const payload = {
-      action: "sendMessage",
-      name: document.getElementById("cf-name").value.trim(),
-      email: document.getElementById("cf-email").value.trim(),
-      message: document.getElementById("cf-message").value.trim(),
-    };
-
-    if (!backendReady) {
-      msgEl.textContent = "Message form isn't connected yet — please email me directly.";
-      msgEl.classList.add("err");
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Sending…";
-
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-      });
-      msgEl.textContent = "Thanks! Your message has been sent — I'll get back to you soon.";
-      msgEl.classList.add("ok");
-      form.reset();
-    } catch (err) {
-      msgEl.textContent = "Something went wrong sending your message. Please try emailing me directly.";
-      msgEl.classList.add("err");
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Send Message →";
-    }
-  });
-
-  loadContent();
-})();
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
