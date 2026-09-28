@@ -14,6 +14,8 @@
   const dashboardView = document.getElementById("dashboardView");
   const loginForm = document.getElementById("loginForm");
   const loginErr = document.getElementById("loginErr");
+  const loginSubmitBtn = loginForm?.querySelector('button[type="submit"]');
+  const logoutBtn = document.getElementById("logoutBtn");
   const toastContainer = document.getElementById("toastContainer");
   const confirmModal = document.getElementById("confirmModal");
   const confirmMessage = document.getElementById("confirmMessage");
@@ -23,16 +25,73 @@
   let state = { settings: {}, projects: [], skills: {} };
   let pendingConfirm = null;
 
+  function getPersistedSessionState() {
+    try {
+      return JSON.parse(window.name || "{}");
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function setPersistedSessionState(token, guardTime) {
+    const state = getPersistedSessionState();
+    state.admin_token = token;
+    state.admin_session_guard = guardTime;
+    window.name = JSON.stringify(state);
+  }
+
+  function clearPersistedSessionState() {
+    try {
+      const state = getPersistedSessionState();
+      delete state.admin_token;
+      delete state.admin_session_guard;
+      window.name = JSON.stringify(state);
+    } catch (_) {
+      window.name = "{}";
+    }
+  }
+
   function getToken() {
-    return sessionStorage.getItem("admin_token") || "";
+    return localStorage.getItem("admin_token") ||
+      sessionStorage.getItem("admin_token") ||
+      getPersistedSessionState().admin_token ||
+      "";
   }
+
   function setToken(t) {
+    const guardTime = Date.now();
     sessionStorage.setItem("admin_token", t);
-    localStorage.setItem("admin_session_guard", Date.now().toString());
+    sessionStorage.setItem("admin_session_guard", String(guardTime));
+    localStorage.setItem("admin_token", t);
+    localStorage.setItem("admin_session_guard", String(guardTime));
+    setPersistedSessionState(t, guardTime);
   }
+
   function clearToken() {
     sessionStorage.removeItem("admin_token");
+    sessionStorage.removeItem("admin_session_guard");
+    localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_session_guard");
+    clearPersistedSessionState();
+  }
+
+  function setLoadingState(button, isLoading, label) {
+    if (!button) return;
+    const btnLabel = button.querySelector(".btn-label");
+    const spinner = button.querySelector(".spinner");
+
+    if (isLoading) {
+      button.classList.add("is-loading");
+      button.disabled = true;
+      if (btnLabel) btnLabel.textContent = label;
+      if (spinner) spinner.style.display = "inline-block";
+      return;
+    }
+
+    button.classList.remove("is-loading");
+    button.disabled = false;
+    if (btnLabel) btnLabel.textContent = label;
+    if (spinner) spinner.style.display = "none";
   }
 
   function showToast(message, type = "success") {
@@ -49,6 +108,29 @@
       toast.classList.remove("show");
       setTimeout(() => toast.remove(), 220);
     }, 2600);
+  }
+
+  function normalizeImageUrl(url) {
+    if (!url || typeof url !== "string") return "";
+    const trimmed = url.trim();
+    if (!trimmed) return "";
+
+    const driveMatch = trimmed.match(/(?:https?:\/\/)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+    if (driveMatch && driveMatch[1]) {
+      return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+    }
+
+    const openMatch = trimmed.match(/(?:https?:\/\/)?drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+    if (openMatch && openMatch[1]) {
+      return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
+    }
+
+    const ucMatch = trimmed.match(/id=([a-zA-Z0-9_-]+)/i);
+    if (ucMatch && ucMatch[1]) {
+      return `https://drive.google.com/uc?export=view&id=${ucMatch[1]}`;
+    }
+
+    return trimmed;
   }
 
   function askConfirm(message, onConfirm) {
@@ -104,6 +186,14 @@
     loginErr.textContent = "";
     const username = document.getElementById("lg-user").value.trim();
     const password = document.getElementById("lg-pass").value;
+
+    if (!username || !password) {
+      loginErr.textContent = "Username and password are required.";
+      return;
+    }
+
+    setLoadingState(loginSubmitBtn, true, "Logging in...");
+
     try {
       const data = await api("login", { username, password });
       setToken(data.token);
@@ -112,29 +202,87 @@
     } catch (err) {
       loginErr.textContent = err.message;
       showToast(err.message, "error");
+    } finally {
+      setLoadingState(loginSubmitBtn, false, "Log In");
     }
   });
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    askConfirm("Are you sure you want to log out? This will end the current admin session.", () => {
-      clearToken();
-      dashboardView.style.display = "none";
-      loginView.style.display = "flex";
-      loginForm.reset();
-      showToast("You have been logged out.", "warning");
-      window.history.pushState(null, "", window.location.href);
-    });
+  loginForm.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const target = e.target;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+        e.preventDefault();
+        loginForm.requestSubmit();
+      }
+    }
   });
 
+  logoutBtn.addEventListener("click", () => {
+    askConfirm("Are you sure you want to log out? This will end the current admin session.", () => {
+      setLoadingState(logoutBtn, true, "Logging out...");
+
+      setTimeout(() => {
+        clearToken();
+        dashboardView.style.display = "none";
+        loginView.style.display = "flex";
+        loginForm.reset();
+        setLoadingState(logoutBtn, false, "Log Out");
+        showToast("You have been logged out.", "warning");
+        window.history.pushState(null, "", window.location.href);
+      }, 450);
+    });
+  });
+  document.getElementById("saveAdminCredentialsBtn")?.addEventListener("click", async () => {
+    const statusEl = document.getElementById("status-security");
+    const username = document.getElementById("adminUsername").value.trim();
+    const password = document.getElementById("adminPassword").value;
+    const confirmPassword = document.getElementById("adminPasswordConfirm").value;
+
+    statusEl.textContent = "Saving…";
+    statusEl.className = "save-status";
+
+    if (!username || !password || !confirmPassword) {
+      statusEl.textContent = "Username and password are required.";
+      statusEl.classList.add("err");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      statusEl.textContent = "Passwords do not match.";
+      statusEl.classList.add("err");
+      return;
+    }
+
+    try {
+      await api("updateAdminCredentials", { username, password });
+      document.getElementById("adminUsername").value = "";
+      document.getElementById("adminPassword").value = "";
+      document.getElementById("adminPasswordConfirm").value = "";
+      statusEl.textContent = "Credentials saved.";
+      statusEl.classList.add("ok");
+      showToast("Admin credentials updated successfully.", "success");
+    } catch (err) {
+      statusEl.textContent = err.message;
+      statusEl.classList.add("err");
+      showToast(err.message, "error");
+    }
+  });
   document.getElementById("clearInboxBtn")?.addEventListener("click", clearInbox);
 
   function enforceSessionGuard() {
-    const guarded = localStorage.getItem("admin_session_guard");
-    if (!getToken() || !backendReady || !guarded) {
+    const token = getToken();
+
+    if (!backendReady) {
       clearToken();
       showLoginView();
       return false;
     }
+
+    if (!token) {
+      showLoginView();
+      return false;
+    }
+
     return true;
   }
 
@@ -157,6 +305,7 @@
     }
 
     showDashboardView();
+    renderProjectLoadingState();
     try {
       const data = await getContent();
       state.settings = data.settings || {};
@@ -210,6 +359,9 @@
       document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
       btn.classList.add("active");
       document.querySelector(`.tab-panel[data-panel="${btn.dataset.tab}"]`).classList.add("active");
+      if (btn.dataset.tab === "projects" && projectList && !state.projects.length) {
+        renderProjectLoadingState();
+      }
       if (btn.dataset.tab === "messages") loadMessages();
     });
   });
@@ -259,8 +411,35 @@
   /* ---------------- Projects editor ---------------- */
   const projectList = document.getElementById("projectList");
 
-  function renderProjects() {
+  function renderProjectLoadingState() {
+    if (!projectList) return;
     projectList.innerHTML = "";
+    const skeletonCount = 2;
+    for (let i = 0; i < skeletonCount; i += 1) {
+      const card = document.createElement("div");
+      card.className = "project-loading-card";
+      card.innerHTML = `
+        <div class="project-loading-visual"></div>
+        <div class="project-loading-body">
+          <div class="project-loading-line short"></div>
+          <div class="project-loading-line"></div>
+          <div class="project-loading-line long"></div>
+          <div class="project-loading-tags">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      `;
+      projectList.appendChild(card);
+    }
+  }
+
+  function renderProjects() {
+    if (!projectList) return;
+    projectList.innerHTML = "";
+    if (!state.projects.length) {
+      renderProjectLoadingState();
+      return;
+    }
     state.projects.forEach((p) => projectList.appendChild(projectCardEl(p)));
   }
 
@@ -288,8 +467,11 @@
           <textarea class="f-description" rows="3">${escHtml(p.description)}</textarea>
         </div>
         <div class="field full">
-          <label>Image URL (leave blank to show placeholder)</label>
-          <input type="url" class="f-image" placeholder="https://..." value="${escAttr(p.image)}">
+          <label>Project image</label>
+          <input type="text" class="f-image" placeholder="Paste image URL" value="${escAttr(p.image)}">
+          <div class="project-image-preview-wrap ${p.image ? "" : "project-image-empty"}">
+            <img class="project-image-preview" src="${escAttr(p.image || "")}" alt="Project preview">
+          </div>
         </div>
         <div class="field full">
           <label>Tags (comma-separated)</label>
@@ -302,6 +484,35 @@
         <span class="save-status"></span>
       </div>`;
 
+    const imageInput = wrap.querySelector(".f-image");
+    const preview = wrap.querySelector(".project-image-preview");
+    const previewWrap = wrap.querySelector(".project-image-preview-wrap");
+
+    const syncProjectPreview = (url) => {
+      if (!preview || !previewWrap) return;
+      const cleanedUrl = normalizeImageUrl(String(url || "").trim());
+      const isValidImage = cleanedUrl && (
+        cleanedUrl.startsWith("data:image/") ||
+        cleanedUrl.startsWith("http://") ||
+        cleanedUrl.startsWith("https://")
+      );
+
+      if (!isValidImage) {
+        preview.src = "";
+        previewWrap.classList.add("project-image-empty");
+        return;
+      }
+
+      preview.src = cleanedUrl;
+      previewWrap.classList.remove("project-image-empty");
+    };
+
+    syncProjectPreview(p.image || "");
+
+    imageInput.addEventListener("input", () => {
+      syncProjectPreview(imageInput.value);
+    });
+
     wrap.querySelector('[data-act="save"]').addEventListener("click", async () => {
       const statusEl = wrap.querySelector(".save-status");
       const updated = {
@@ -311,7 +522,7 @@
         role: wrap.querySelector(".f-role").value,
         company: wrap.querySelector(".f-company").value,
         description: wrap.querySelector(".f-description").value,
-        image: wrap.querySelector(".f-image").value,
+        image: normalizeImageUrl(imageInput.value),
         tags: wrap.querySelector(".f-tags").value,
       };
       statusEl.textContent = "Saving…";
