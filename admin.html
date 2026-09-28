@@ -52,7 +52,16 @@
   .project-editor .field-grid .field.full{ grid-column:1/-1; }
   .row-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
   .btn-danger{ background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.35); color:#f87171; padding:9px 16px; border-radius:999px; font-size:0.82rem; cursor:pointer; }
+  .btn-danger.is-loading{ position:relative; pointer-events:none; opacity:0.9; }
+  .btn-danger .spinner{ display:none; width:12px; height:12px; border:2px solid rgba(255,255,255,0.35); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:6px; vertical-align:middle; }
+  .btn-danger.is-loading .spinner{ display:inline-block; }
   .btn-add{ background:transparent; border:1px dashed var(--panel-border); color:var(--text-1); padding:12px; width:100%; border-radius:var(--radius-md); cursor:pointer; font-size:0.88rem; }
+  .project-list-loading{ display:grid; gap:16px; }
+  .project-skeleton-card{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:16px; background:rgba(255,255,255,0.02); }
+  .project-skeleton-line{ height:12px; border-radius:999px; background:linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
+  .project-skeleton-line.title{ height:18px; width:75%; margin-bottom:12px; }
+  .project-skeleton-line.long{ height:12px; width:100%; margin-top:10px; }
+  .project-skeleton-line.short{ height:12px; width:55%; margin-top:10px; }
   .btn-add:hover{ border-color:var(--violet-soft); color:var(--text-0); }
 
   /* Notification UI */
