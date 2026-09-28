@@ -22,7 +22,16 @@
   .login-card p{ color:var(--text-2); font-size:0.85rem; margin-bottom:24px; }
   .login-card .field{ margin-bottom:14px; }
   .login-card .btn{ width:100%; justify-content:center; margin-top:8px; }
+  .login-card .btn.is-loading{ position:relative; pointer-events:none; opacity:0.9; }
+  .login-card .btn.is-loading .spinner{ display:inline-block; }
+  .login-card .btn .spinner{ display:none; width:14px; height:14px; border:2px solid rgba(255,255,255,0.35); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; vertical-align:middle; }
   .login-err{ color:#f87171; font-size:0.85rem; min-height:18px; margin-top:10px; }
+
+  .logout-btn.is-loading{ position:relative; pointer-events:none; opacity:0.9; }
+  .logout-btn.is-loading .spinner{ display:inline-block; }
+  .logout-btn .spinner{ display:none; width:12px; height:12px; border:2px solid rgba(255,255,255,0.35); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; vertical-align:middle; }
+
+  @keyframes spin{ to{ transform:rotate(360deg);} }
 
   /* Tabs */
   .tab-bar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
@@ -43,8 +52,32 @@
   .project-editor .field-grid .field.full{ grid-column:1/-1; }
   .row-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
   .btn-danger{ background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.35); color:#f87171; padding:9px 16px; border-radius:999px; font-size:0.82rem; cursor:pointer; }
+  .btn-danger.is-loading{ position:relative; pointer-events:none; opacity:0.9; }
+  .btn-danger .spinner{ display:none; width:12px; height:12px; border:2px solid rgba(255,255,255,0.35); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:6px; vertical-align:middle; }
+  .btn-danger.is-loading .spinner{ display:inline-block; }
   .btn-add{ background:transparent; border:1px dashed var(--panel-border); color:var(--text-1); padding:12px; width:100%; border-radius:var(--radius-md); cursor:pointer; font-size:0.88rem; }
+  .project-list-loading{ display:grid; gap:16px; }
+  .project-skeleton-card{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:16px; background:rgba(255,255,255,0.02); }
+  .project-skeleton-line{ height:12px; border-radius:999px; background:linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
+  .project-skeleton-line.title{ height:18px; width:75%; margin-bottom:12px; }
+  .project-skeleton-line.long{ height:12px; width:100%; margin-top:10px; }
+  .project-skeleton-line.short{ height:12px; width:55%; margin-top:10px; }
   .btn-add:hover{ border-color:var(--violet-soft); color:var(--text-0); }
+
+  /* Notification UI */
+  .toast-container{ position:fixed; top:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:50; }
+  .toast{ min-width:240px; max-width:360px; padding:12px 16px; border-radius:12px; background:rgba(13,18,35,0.96); border:1px solid var(--panel-border); color:var(--text-0); box-shadow:0 18px 40px rgba(0,0,0,0.32); opacity:0; transform:translateY(-10px); transition:all 0.22s ease; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+  .toast.success{ border-color:rgba(52,211,153,0.5); color:#d1fae5; }
+  .toast.error{ border-color:rgba(248,113,113,0.5); color:#fecaca; }
+  .toast.warning{ border-color:rgba(250,204,21,0.5); color:#fef3c7; }
+
+  .confirm-modal{ position:fixed; inset:0; background:rgba(3,7,18,0.72); display:flex; align-items:center; justify-content:center; padding:24px; z-index:60; }
+  .confirm-modal.hidden{ display:none; }
+  .confirm-card{ width:min(420px, 100%); background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius-lg); padding:24px; box-shadow:0 30px 80px rgba(0,0,0,0.4); }
+  .confirm-card h3{ margin:0 0 8px; font-size:1.1rem; }
+  .confirm-card p{ margin:0 0 20px; color:var(--text-2); line-height:1.6; }
+  .confirm-actions{ display:flex; justify-content:flex-end; gap:10px; }
 
   /* Skills editor */
   .skill-cat{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:16px; margin-bottom:14px; }
@@ -55,6 +88,33 @@
   .skill-tag button{ background:transparent; border:none; color:var(--text-2); cursor:pointer; font-size:0.9rem; }
   .skill-add-row{ display:flex; gap:8px; }
   .skill-add-row input{ flex:1; }
+
+  @media (max-width: 760px) {
+    .admin-shell{ padding:24px 14px 56px; }
+    .admin-header{ align-items:flex-start; }
+    .admin-header h1{ font-size:1.2rem; width:100%; }
+    .logout-btn{ width:100%; justify-content:center; }
+    .login-wrap{ padding:16px; }
+    .login-card{ padding:24px 18px; }
+    .login-card h1{ font-size:1.2rem; }
+    .tab-bar{ gap:6px; }
+    .tab-btn{ flex:1 1 calc(50% - 6px); text-align:center; padding:10px 12px; }
+    .tab-panel{ padding:18px 14px; }
+    .save-row{ flex-direction:column; align-items:flex-start; }
+    .project-editor{ padding:14px; }
+    .project-editor .field-grid,
+    .field-grid{ grid-template-columns:1fr !important; }
+    .row-actions{ flex-direction:column-reverse; }
+    .row-actions > *{ width:100%; }
+    .skill-cat-head{ flex-direction:column; align-items:flex-start; }
+    .skill-cat-head input{ width:100%; }
+    .skill-add-row{ flex-direction:column; }
+    .confirm-card{ padding:18px 16px; }
+    .confirm-actions{ flex-direction:column-reverse; }
+    .confirm-actions .btn{ width:100%; }
+    .toast-container{ left:12px; right:12px; top:12px; }
+    .toast{ max-width:none; width:100%; min-width:0; }
+  }
 </style>
 </head>
 <body>
@@ -62,7 +122,7 @@
 <!-- ================= LOGIN VIEW ================= -->
 <div class="login-wrap" id="loginView">
   <div class="login-card">
-    <h1>Admin Login (REIGN MAY NAGALAW AKO DAHIL SA KAANTOKAN PERO FIX KO BUKAS TULOG NA AKO GOODNIGHT)</h1>
+    <h1>Admin Login</h1>
     <p>Sign in to edit the portfolio content.</p>
     <form id="loginForm">
       <div class="field">
@@ -73,9 +133,24 @@
         <label for="lg-pass">Password</label>
         <input type="password" id="lg-pass" autocomplete="current-password" required>
       </div>
-      <button class="btn btn-primary" type="submit">Log In</button>
+      <button class="btn btn-primary" type="submit">
+        <span class="spinner"></span><span class="btn-label">Log In</span>
+      </button>
       <div class="login-err" id="loginErr"></div>
     </form>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<div id="confirmModal" class="confirm-modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-card">
+    <h3 id="confirmTitle">Confirm action</h3>
+    <p id="confirmMessage">Are you sure?</p>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" id="confirmCancelBtn">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmOkBtn">Continue</button>
+    </div>
   </div>
 </div>
 
@@ -83,7 +158,9 @@
 <div class="admin-shell" id="dashboardView" style="display:none;">
   <div class="admin-header">
     <h1>Portfolio Settings</h1>
-    <button class="logout-btn" id="logoutBtn">Log Out</button>
+    <button class="logout-btn" id="logoutBtn" type="button">
+      <span class="spinner"></span><span class="btn-label">Log Out</span>
+    </button>
   </div>
 
   <div class="tab-bar">
@@ -92,6 +169,7 @@
     <button class="tab-btn" data-tab="skills">Skills</button>
     <button class="tab-btn" data-tab="contact">Contact</button>
     <button class="tab-btn" data-tab="footer">Footer</button>
+    <button class="tab-btn" data-tab="security">Security</button>
     <button class="tab-btn" data-tab="messages">Messages</button>
   </div>
 
@@ -166,9 +244,33 @@
     </div>
   </div>
 
+  <!-- Security -->
+  <div class="tab-panel" data-panel="security">
+    <h2>Security</h2>
+    <div class="field" style="margin-bottom:14px;">
+      <label>New username</label>
+      <input type="text" id="adminUsername" autocomplete="username">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>New password</label>
+      <input type="password" id="adminPassword" autocomplete="new-password">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Confirm password</label>
+      <input type="password" id="adminPasswordConfirm" autocomplete="new-password">
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" id="saveAdminCredentialsBtn" type="button">Save Credentials</button>
+      <span class="save-status" id="status-security"></span>
+    </div>
+  </div>
+
   <!-- Messages -->
   <div class="tab-panel" data-panel="messages">
-    <h2>Messages from Contact Form</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
+      <h2 style="margin:0;">Messages from Contact Form</h2>
+      <button id="clearInboxBtn" class="btn btn-ghost" type="button" style="padding:10px 18px; font-size:0.8rem;">Clear Inbox</button>
+    </div>
     <div id="messagesList" style="color:var(--text-2); font-size:0.9rem;">Loading…</div>
   </div>
 </div>
