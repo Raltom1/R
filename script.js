@@ -3,7 +3,7 @@
    - Pulls editable content from the Google Sheet (via Apps Script API)
    - Falls back to the static markup already in index.html if the
      backend isn't configured yet or a fetch fails
-=================================================================== */
+================================================================== */
 
 (function () {
   "use strict";
