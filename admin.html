@@ -50,45 +50,6 @@
   .project-editor{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:18px; margin-bottom:16px; }
   .project-editor .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .project-editor .field-grid .field.full{ grid-column:1/-1; }
-  .project-image-preview-wrap{ margin-top:10px; border:1px solid var(--panel-border); border-radius:12px; overflow:hidden; background:rgba(255,255,255,0.02); }
-  .project-image-preview{ display:block; width:100%; max-height:220px; object-fit:cover; }
-  .project-image-empty{ display:none; }
-  .project-loading-card{
-    background:rgba(255,255,255,0.02);
-    border:1px solid var(--panel-border);
-    border-radius:var(--radius-md);
-    overflow:hidden;
-    margin-bottom:16px;
-    min-height:170px;
-    position:relative;
-  }
-  .project-loading-visual,
-  .project-loading-line,
-  .project-loading-tags span{
-    position:relative;
-    overflow:hidden;
-    background:rgba(255,255,255,0.06);
-  }
-  .project-loading-visual::before,
-  .project-loading-line::before,
-  .project-loading-tags span::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 30%, transparent 60%);
-    transform:translateX(-100%);
-    animation: shimmer 1.1s linear infinite;
-  }
-  .project-loading-visual{
-    height:120px;
-    border-bottom:1px solid var(--panel-border);
-  }
-  .project-loading-body{ padding:16px; }
-  .project-loading-line{ height:12px; border-radius:999px; margin-bottom:10px; }
-  .project-loading-line.short{ width:38%; }
-  .project-loading-line.long{ width:76%; }
-  .project-loading-tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-  .project-loading-tags span{ display:block; width:70px; height:22px; border-radius:999px; }
   .row-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
   .btn-danger{ background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.35); color:#f87171; padding:9px 16px; border-radius:999px; font-size:0.82rem; cursor:pointer; }
   .btn-add{ background:transparent; border:1px dashed var(--panel-border); color:var(--text-1); padding:12px; width:100%; border-radius:var(--radius-md); cursor:pointer; font-size:0.88rem; }
