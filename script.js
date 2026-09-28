@@ -46,9 +46,44 @@
   );
   revealEls.forEach((el) => io.observe(el));
 
+  const projectGrid = document.getElementById("projectGrid");
+
+  function showProjectLoading() {
+    if (!projectGrid) return;
+    projectGrid.classList.add("is-loading");
+    projectGrid.innerHTML = "";
+    const skeletonCount = 2;
+    for (let i = 0; i < skeletonCount; i += 1) {
+      const skeleton = document.createElement("article");
+      skeleton.className = "project-skeleton-card";
+      skeleton.innerHTML = `
+        <div class="project-skeleton-media">
+          <div class="skeleton-shimmer"></div>
+        </div>
+        <div class="project-skeleton-body">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line long"></div>
+          <div class="skeleton-tags">
+            <span class="skeleton-tag"></span>
+            <span class="skeleton-tag"></span>
+            <span class="skeleton-tag"></span>
+          </div>
+        </div>
+      `;
+      projectGrid.appendChild(skeleton);
+    }
+  }
+
+  function hideProjectLoading() {
+    if (!projectGrid) return;
+    projectGrid.classList.remove("is-loading");
+  }
+
   /* ---------------- Fetch content from the sheet ---------------- */
   async function loadContent() {
     if (!backendReady) return;
+    showProjectLoading();
     try {
       const res = await fetch(`${APPS_SCRIPT_URL}?action=getContent`);
       const data = await res.json();
@@ -56,11 +91,14 @@
       applySettings(data.settings || {});
       if (Array.isArray(data.projects) && data.projects.length) {
         renderProjects(data.projects);
+      } else {
+        hideProjectLoading();
       }
       if (data.skills && Object.keys(data.skills).length) {
         renderSkills(data.skills);
       }
     } catch (err) {
+      hideProjectLoading();
       // Silently keep the static fallback content already in the page.
       console.warn("Portfolio content fetch failed, showing fallback content.", err);
     }
@@ -106,17 +144,45 @@
   }
 
   /* ---------------- Render projects ---------------- */
+  function normalizeImageUrl(url) {
+    if (!url || typeof url !== "string") return "";
+    const trimmed = url.trim();
+    if (!trimmed) return "";
+
+    const driveMatch = trimmed.match(/(?:https?:\/\/)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+    if (driveMatch && driveMatch[1]) {
+      return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+    }
+
+    const openMatch = trimmed.match(/(?:https?:\/\/)?drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+    if (openMatch && openMatch[1]) {
+      return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
+    }
+
+    const ucMatch = trimmed.match(/id=([a-zA-Z0-9_-]+)/i);
+    if (ucMatch && ucMatch[1]) {
+      return `https://drive.google.com/uc?export=view&id=${ucMatch[1]}`;
+    }
+
+    return trimmed;
+  }
+
   function renderProjects(projects) {
     const grid = document.getElementById("projectGrid");
     grid.innerHTML = "";
+    hideProjectLoading();
     projects
       .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
       .forEach((p) => {
         const card = document.createElement("article");
         card.className = "project-card reveal";
+        const safeImageUrl = normalizeImageUrl(p.image || "");
 
-        const media = p.image
-          ? `<div class="project-media"><img src="${escapeAttr(p.image)}" alt="${escapeAttr(p.title || "Project image")}" loading="lazy"></div>`
+        const media = safeImageUrl
+          ? `<div class="project-media is-loading">
+               <div class="media-loader skeleton"></div>
+               <img class="project-image" src="${escapeAttr(safeImageUrl)}" alt="${escapeAttr(p.title || "Project image")}" loading="lazy" style="opacity:0;">
+             </div>`
           : `<div class="project-media">
                <div class="placeholder">
                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
@@ -141,6 +207,33 @@
             <p>${escapeHtml(p.description || "")}</p>
             <div class="tag-row">${tags}</div>
           </div>`;
+
+        const projectImage = card.querySelector(".project-image");
+        const mediaLoader = card.querySelector(".media-loader");
+        if (projectImage && mediaLoader) {
+          projectImage.addEventListener("load", () => {
+            projectImage.style.opacity = "1";
+            projectImage.style.transition = "opacity 0.35s ease";
+            mediaLoader.style.opacity = "0";
+            setTimeout(() => mediaLoader.remove(), 220);
+            card.querySelector(".project-media")?.classList.remove("is-loading");
+          });
+
+          projectImage.addEventListener("error", () => {
+            mediaLoader.remove();
+            const media = card.querySelector(".project-media");
+            if (media) {
+              media.classList.remove("is-loading");
+              media.innerHTML = `
+                <div class="placeholder">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  <span>Image unavailable</span>
+                </div>
+              `;
+            }
+          });
+        }
+
         grid.appendChild(card);
         io.observe(card);
       });
