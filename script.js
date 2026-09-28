@@ -106,6 +106,40 @@
   }
 
   /* ---------------- Render projects ---------------- */
+  const imageLightbox = document.getElementById("imageLightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxClose = document.getElementById("lightboxClose");
+
+  function openLightbox(src, alt) {
+    if (!imageLightbox || !lightboxImage) return;
+    lightboxImage.src = src;
+    lightboxImage.alt = alt || "Project image";
+    imageLightbox.classList.add("is-open");
+    imageLightbox.setAttribute("aria-hidden", "false");
+    document.body.classList.add("lightbox-open");
+  }
+
+  function closeLightbox() {
+    if (!imageLightbox || !lightboxImage) return;
+    imageLightbox.classList.remove("is-open");
+    imageLightbox.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("lightbox-open");
+    lightboxImage.removeAttribute("src");
+    lightboxImage.alt = "";
+  }
+
+  if (imageLightbox && lightboxClose) {
+    lightboxClose.addEventListener("click", closeLightbox);
+    imageLightbox.addEventListener("click", (event) => {
+      if (event.target === imageLightbox) closeLightbox();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && imageLightbox.classList.contains("is-open")) {
+        closeLightbox();
+      }
+    });
+  }
+
   function renderProjects(projects) {
     const grid = document.getElementById("projectGrid");
     grid.innerHTML = "";
@@ -154,6 +188,10 @@
             mediaLoader.style.opacity = "0";
             setTimeout(() => mediaLoader.remove(), 220);
             card.querySelector(".project-media")?.classList.remove("is-loading");
+          });
+
+          projectImage.addEventListener("click", () => {
+            openLightbox(projectImage.src, projectImage.alt || p.title || "Project image");
           });
 
           projectImage.addEventListener("error", () => {
