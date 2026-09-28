@@ -86,6 +86,10 @@ function doPost(e) {
         clearMessages();
         return jsonOut({ success: true, messages: readMessages() });
 
+      case "updateAdminCredentials":
+        requireAuth(body.token);
+        return jsonOut(updateAdminCredentials(body.username, body.password));
+
       default:
         return jsonOut({ success: false, error: "Unknown action" });
     }
@@ -192,6 +196,30 @@ function requireAuth(token) {
   const user = CacheService.getScriptCache().get("session_" + token);
   if (!user) throw new Error("Session expired. Please log in again.");
   return user;
+}
+
+function updateAdminCredentials(username, password) {
+  const trimmedUser = String(username || "").trim();
+  const trimmedPassword = String(password || "").trim();
+
+  if (!trimmedUser) {
+    throw new Error("Username cannot be empty.");
+  }
+
+  if (!trimmedPassword) {
+    throw new Error("Password cannot be empty.");
+  }
+
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty(ADMIN_USER_KEY, trimmedUser);
+  props.setProperty(ADMIN_PASS_HASH_KEY, hashString(trimmedPassword));
+  props.deleteProperty("ADMIN_PASS");
+
+  return {
+    success: true,
+    username: trimmedUser,
+    updated: true,
+  };
 }
 
 /* ------------------------- Settings sheet ------------------------- */
