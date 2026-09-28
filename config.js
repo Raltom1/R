@@ -4,4 +4,4 @@
    Instructions: see README.md, section "Deploying the backend".
    Example: "https://script.google.com/macros/s/AKfycb.../exec"
 =================================================================== */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxk5d33eaHi_16cfzAJjj7DfgglVQjl94JQUuVUWbJ4oWhfkYKb1gVWnYwPQo8hcQfR/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxmQTkJ1pskoyeBh6UXml14i1C_yCGgaar1KsFQUjXYPFT2IsK-A97gT2dULswSFvyN/exec";
