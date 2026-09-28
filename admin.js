@@ -56,6 +56,37 @@
     if (spinner) spinner.style.display = "none";
   }
 
+  function setInlineLoading(button, isLoading, label) {
+    if (!button) return;
+    let spinner = button.querySelector(".spinner");
+    let textNode = button.querySelector(".btn-label");
+
+    if (!spinner) {
+      spinner = document.createElement("span");
+      spinner.className = "spinner";
+      button.prepend(spinner);
+    }
+    if (!textNode) {
+      textNode = document.createElement("span");
+      textNode.className = "btn-label";
+      textNode.textContent = button.textContent.trim();
+      button.appendChild(textNode);
+    }
+
+    if (isLoading) {
+      button.classList.add("is-loading");
+      button.disabled = true;
+      textNode.textContent = label;
+      spinner.style.display = "inline-block";
+      return;
+    }
+
+    button.classList.remove("is-loading");
+    button.disabled = false;
+    textNode.textContent = label;
+    spinner.style.display = "none";
+  }
+
   function showToast(message, type = "success") {
     if (!toastContainer) return;
 
@@ -237,6 +268,7 @@
     }
 
     showDashboardView();
+    renderProjectsLoading();
     try {
       const data = await getContent();
       state.settings = data.settings || {};
@@ -339,7 +371,25 @@
   /* ---------------- Projects editor ---------------- */
   const projectList = document.getElementById("projectList");
 
+  function renderProjectsLoading() {
+    if (!projectList) return;
+    projectList.innerHTML = `
+      <div class="project-list-loading">
+        <div class="project-skeleton-card">
+          <div class="project-skeleton-line title"></div>
+          <div class="project-skeleton-line long"></div>
+          <div class="project-skeleton-line short"></div>
+        </div>
+        <div class="project-skeleton-card">
+          <div class="project-skeleton-line title"></div>
+          <div class="project-skeleton-line long"></div>
+          <div class="project-skeleton-line short"></div>
+        </div>
+      </div>`;
+  }
+
   function renderProjects() {
+    if (!projectList) return;
     projectList.innerHTML = "";
     state.projects.forEach((p) => projectList.appendChild(projectCardEl(p)));
   }
@@ -409,13 +459,19 @@
     });
 
     wrap.querySelector('[data-act="delete"]').addEventListener("click", async () => {
+      const deleteBtn = wrap.querySelector('[data-act="delete"]');
       if (!confirm("Delete this project?")) return;
+
+      setInlineLoading(deleteBtn, true, "Deleting...");
       try {
         if (p.id) await api("deleteProject", { id: p.id });
         wrap.remove();
         state.projects = state.projects.filter((x) => x.id !== p.id);
+        showToast("Project deleted successfully.", "success");
       } catch (err) {
         alert(err.message);
+      } finally {
+        setInlineLoading(deleteBtn, false, "Delete");
       }
     });
 
