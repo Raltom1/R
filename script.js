@@ -46,44 +46,9 @@
   );
   revealEls.forEach((el) => io.observe(el));
 
-  const projectGrid = document.getElementById("projectGrid");
-
-  function showProjectLoading() {
-    if (!projectGrid) return;
-    projectGrid.classList.add("is-loading");
-    projectGrid.innerHTML = "";
-    const skeletonCount = 2;
-    for (let i = 0; i < skeletonCount; i += 1) {
-      const skeleton = document.createElement("article");
-      skeleton.className = "project-skeleton-card";
-      skeleton.innerHTML = `
-        <div class="project-skeleton-media">
-          <div class="skeleton-shimmer"></div>
-        </div>
-        <div class="project-skeleton-body">
-          <div class="skeleton-line short"></div>
-          <div class="skeleton-line"></div>
-          <div class="skeleton-line long"></div>
-          <div class="skeleton-tags">
-            <span class="skeleton-tag"></span>
-            <span class="skeleton-tag"></span>
-            <span class="skeleton-tag"></span>
-          </div>
-        </div>
-      `;
-      projectGrid.appendChild(skeleton);
-    }
-  }
-
-  function hideProjectLoading() {
-    if (!projectGrid) return;
-    projectGrid.classList.remove("is-loading");
-  }
-
   /* ---------------- Fetch content from the sheet ---------------- */
   async function loadContent() {
     if (!backendReady) return;
-    showProjectLoading();
     try {
       const res = await fetch(`${APPS_SCRIPT_URL}?action=getContent`);
       const data = await res.json();
@@ -91,14 +56,11 @@
       applySettings(data.settings || {});
       if (Array.isArray(data.projects) && data.projects.length) {
         renderProjects(data.projects);
-      } else {
-        hideProjectLoading();
       }
       if (data.skills && Object.keys(data.skills).length) {
         renderSkills(data.skills);
       }
     } catch (err) {
-      hideProjectLoading();
       // Silently keep the static fallback content already in the page.
       console.warn("Portfolio content fetch failed, showing fallback content.", err);
     }
@@ -144,44 +106,19 @@
   }
 
   /* ---------------- Render projects ---------------- */
-  function normalizeImageUrl(url) {
-    if (!url || typeof url !== "string") return "";
-    const trimmed = url.trim();
-    if (!trimmed) return "";
-
-    const driveMatch = trimmed.match(/(?:https?:\/\/)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
-    if (driveMatch && driveMatch[1]) {
-      return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
-    }
-
-    const openMatch = trimmed.match(/(?:https?:\/\/)?drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
-    if (openMatch && openMatch[1]) {
-      return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
-    }
-
-    const ucMatch = trimmed.match(/id=([a-zA-Z0-9_-]+)/i);
-    if (ucMatch && ucMatch[1]) {
-      return `https://drive.google.com/uc?export=view&id=${ucMatch[1]}`;
-    }
-
-    return trimmed;
-  }
-
   function renderProjects(projects) {
     const grid = document.getElementById("projectGrid");
     grid.innerHTML = "";
-    hideProjectLoading();
     projects
       .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
       .forEach((p) => {
         const card = document.createElement("article");
         card.className = "project-card reveal";
-        const safeImageUrl = normalizeImageUrl(p.image || "");
 
-        const media = safeImageUrl
+        const media = p.image
           ? `<div class="project-media is-loading">
                <div class="media-loader skeleton"></div>
-               <img class="project-image" src="${escapeAttr(safeImageUrl)}" alt="${escapeAttr(p.title || "Project image")}" loading="lazy" style="opacity:0;">
+               <img class="project-image" src="${escapeAttr(p.image)}" alt="${escapeAttr(p.title || "Project image")}" loading="lazy" style="opacity:0;">
              </div>`
           : `<div class="project-media">
                <div class="placeholder">
