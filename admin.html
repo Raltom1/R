@@ -3,298 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reign Kerstine Balagtas — System Analyst &amp; UI/UX Enthusiast</title>
-<meta name="description" content="Portfolio of Reign Kerstine A. Balagtas — IT graduate, System Analyst, and UI/UX enthusiast.">
+<title>Admin — Portfolio Settings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  body{ min-height:100vh; }
+  .admin-shell{ max-width:1100px; margin:0 auto; padding:40px 24px 80px; }
+  .admin-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+  .admin-header h1{ font-size:1.5rem; }
+  .logout-btn{ background:var(--panel); border:1px solid var(--panel-border); color:var(--text-1); padding:9px 18px; border-radius:999px; font-size:0.85rem; cursor:pointer; }
+  .logout-btn:hover{ background:rgba(255,255,255,0.08); color:var(--text-0); }
+
+  /* Login */
+  .login-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .login-card{ width:100%; max-width:380px; background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius-lg); padding:36px; }
+  .login-card h1{ font-size:1.3rem; margin-bottom:6px; }
+  .login-card p{ color:var(--text-2); font-size:0.85rem; margin-bottom:24px; }
+  .login-card .field{ margin-bottom:14px; }
+  .login-card .btn{ width:100%; justify-content:center; margin-top:8px; }
+  .login-err{ color:#f87171; font-size:0.85rem; min-height:18px; margin-top:10px; }
+
+  /* Tabs */
+  .tab-bar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+  .tab-btn{ padding:10px 18px; border-radius:999px; background:var(--panel); border:1px solid var(--panel-border); color:var(--text-1); font-size:0.86rem; cursor:pointer; }
+  .tab-btn.active{ background:linear-gradient(135deg, var(--violet), var(--pink)); color:#fff; border-color:transparent; }
+  .tab-panel{ display:none; background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius-lg); padding:28px; }
+  .tab-panel.active{ display:block; }
+  .tab-panel h2{ font-size:1.1rem; margin-bottom:18px; }
+
+  .save-row{ display:flex; align-items:center; gap:14px; margin-top:20px; }
+  .save-status{ font-size:0.84rem; color:var(--text-2); }
+  .save-status.ok{ color:#34d399; }
+  .save-status.err{ color:#f87171; }
+
+  /* Project list editor */
+  .project-editor{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:18px; margin-bottom:16px; }
+  .project-editor .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .project-editor .field-grid .field.full{ grid-column:1/-1; }
+  .row-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+  .btn-danger{ background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.35); color:#f87171; padding:9px 16px; border-radius:999px; font-size:0.82rem; cursor:pointer; }
+  .btn-add{ background:transparent; border:1px dashed var(--panel-border); color:var(--text-1); padding:12px; width:100%; border-radius:var(--radius-md); cursor:pointer; font-size:0.88rem; }
+  .btn-add:hover{ border-color:var(--violet-soft); color:var(--text-0); }
+
+  /* Skills editor */
+  .skill-cat{ border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:16px; margin-bottom:14px; }
+  .skill-cat-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .skill-cat-head input{ background:transparent; border:none; color:var(--text-0); font-family:var(--font-head); font-size:1rem; font-weight:700; width:60%; }
+  .skill-tag-list{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .skill-tag{ display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid var(--panel-border); border-radius:999px; padding:6px 6px 6px 12px; font-size:0.8rem; }
+  .skill-tag button{ background:transparent; border:none; color:var(--text-2); cursor:pointer; font-size:0.9rem; }
+  .skill-add-row{ display:flex; gap:8px; }
+  .skill-add-row input{ flex:1; }
+</style>
 </head>
 <body>
 
-<!-- ================= NAV ================= -->
-<div class="nav-shell" id="navShell">
-  <div class="nav-inner">
-    <a href="#home" class="brand">
-      <span class="brand-mark">RK</span>
-      <span>Reign Kerstine<small>SYSTEM ANALYST &amp; UI/UX</small></span>
-    </a>
-    <nav class="nav-links" id="navLinks">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#projects">Projects</a>
-      <a href="#skills">Skills</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <a href="#contact" class="nav-cta">Let's Connect</a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ================= HERO / ABOUT ================= -->
-<section id="home" class="hero wrap scroll-reveal">
-  <div class="hero-copy">
-    <span class="eyebrow">IT GRADUATE · SYSTEM ANALYST</span>
-    <h1>I turn requirements<br>into systems people <em>actually enjoy using.</em></h1>
-    <p class="lede" id="aboutBio" data-field="about_bio">
-      I'm an IT graduate with an interest in System Analysis, UI/UX Design, and Web Development.
-      I enjoy turning ideas and requirements into organized, user-friendly, and functional systems —
-      from workflow design and documentation to interface design and quality assurance.
-    </p>
-    <div class="hero-actions">
-      <a href="#projects" class="btn btn-primary">View My Work →</a>
-      <a href="#contact" class="btn btn-ghost">Get In Touch</a>
-    </div>
-    <div class="hero-stats">
-      <div><strong>2+</strong><span>System &amp; QA projects</span></div>
-      <div><strong>5</strong><span>Skill disciplines</span></div>
-      <div><strong>1</strong><span>Internship completed</span></div>
-    </div>
-    <div class="badge-dot"><i></i> Open to new opportunities</div>
-  </div>
-
-  <div class="hero-visual">
-    <div class="orb"></div>
-    <div class="orb-ring"></div>
-    <div class="orb-ring ring-2"></div>
-    <div class="float-card fc-top">
-      <strong>Requirements</strong>
-      <span>Gathering &amp; analysis</span>
-    </div>
-    <div class="float-card fc-mid">
-      <strong>UI/UX Design</strong>
-      <span>Figma prototypes</span>
-    </div>
-    <div class="float-card fc-bottom">
-      <strong>QA Testing</strong>
-      <span>Test cases &amp; fixes</span>
-    </div>
-  </div>
-</section>
-
-<!-- ================= ABOUT DETAIL ================= -->
-<section id="about" class="wrap scroll-reveal">
-  <div class="section-head">
-    <div>
-      <span class="eyebrow">ABOUT ME</span>
-      <h2>Hi, I'm Reign Kerstine.</h2>
-    </div>
-    <p>Always open to learning new technologies, improving my skills, and taking on new challenges in the IT field.</p>
-  </div>
-
-  <div class="about-grid">
-    <div class="about-card reveal">
-      <span class="eyebrow">FOCUS AREAS</span>
-      <div class="chip-row">
-        <span class="chip">System Analysis</span>
-        <span class="chip">UI/UX Design</span>
-        <span class="chip">Web Development</span>
-        <span class="chip">Quality Assurance</span>
-        <span class="chip">Documentation</span>
-      </div>
-    </div>
-    <div class="about-card reveal">
-      <p id="aboutLong" data-field="about_long">
-        I have experience working on system requirements, workflow design, UI design, quality assurance,
-        documentation, and data analysis. Through my academic project and internship experience,
-        I've also worked closely with developers to build and test web-based systems.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PROJECTS ================= -->
-<section id="projects" class="wrap scroll-reveal">
-  <div class="section-head">
-    <div>
-      <span class="eyebrow">FEATURED WORK</span>
-      <h2>Projects I've helped bring to life.</h2>
-    </div>
-    <p>System analysis, UI design, and QA work across academic and internship projects.</p>
-  </div>
-
-  <div class="project-grid" id="projectGrid">
-    <!-- Rendered by script.js from Google Sheet data; fallback markup below -->
-    <article class="project-card reveal">
-      <div class="project-media">
-        <div class="placeholder">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <span>Image set by admin</span>
-        </div>
-      </div>
-      <div class="project-body">
-        <div class="project-role">SYSTEM ANALYST</div>
-        <h3>SmartSK — Project Monitoring System</h3>
-        <p>A web-based project monitoring system focused on budgeting, project tracking, and forecasting for the Sangguniang Kabataan.</p>
-        <div class="tag-row">
-          <span class="tag">Requirements</span>
-          <span class="tag">UI Design</span>
-          <span class="tag">Documentation</span>
-        </div>
-      </div>
-    </article>
-
-    <article class="project-card reveal">
-      <div class="project-media">
-        <div class="placeholder">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <span>Image set by admin</span>
-        </div>
-      </div>
-      <div class="project-body">
-        <div class="project-role">SYSTEM ANALYST &amp; QA INTERN — MATIMCO INC.</div>
-        <h3>Daily Time Record (DTR) Management System</h3>
-        <p>A web-based DTR management system developed during my internship to support employee time-record management.</p>
-        <div class="tag-row">
-          <span class="tag">UI &amp; Workflow</span>
-          <span class="tag">Test Cases</span>
-          <span class="tag">Bug Verification</span>
-        </div>
-      </div>
-    </article>
-  </div>
-</section>
-
-<!-- ================= SKILLS ================= -->
-<section id="skills" class="wrap scroll-reveal">
-  <div class="section-head">
-    <div>
-      <span class="eyebrow">SKILLS</span>
-      <h2>What I bring to a project.</h2>
-    </div>
-    <p>Grouped by discipline — from analysis to design to quality assurance.</p>
-  </div>
-
-  <div class="skills-grid" id="skillsGrid">
-    <div class="skill-card reveal">
-      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.2 7.3L11 15.8M15.8 7.3L13 15.8M8.5 6H15.5"/></svg></div>
-      <h4>System Analysis</h4>
-      <ul>
-        <li>Requirements Gathering</li>
-        <li>System Evaluation</li>
-        <li>Workflow Design</li>
-        <li>Technical Documentation</li>
-      </ul>
-    </div>
-    <div class="skill-card reveal">
-      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18h1.5a2 2 0 001.9-2.6 1.7 1.7 0 011.6-2.4H18a3 3 0 003-3 9 9 0 00-9-10z"/><circle cx="7.5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1.1" fill="currentColor" stroke="none"/></svg></div>
-      <h4>UI/UX &amp; Design</h4>
-      <ul>
-        <li>UI Design</li>
-        <li>Basic Frontend Design</li>
-        <li>Figma</li>
-        <li>Presentation Design</li>
-      </ul>
-    </div>
-    <div class="skill-card reveal">
-      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12.3l2 2 4-4.3"/></svg></div>
-      <h4>Quality Assurance</h4>
-      <ul>
-        <li>Test Case Creation</li>
-        <li>Functional Testing</li>
-        <li>Bug Identification &amp; Documentation</li>
-        <li>Fix Verification</li>
-      </ul>
-    </div>
-    <div class="skill-card reveal">
-      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/><line x1="3" y1="20" x2="21" y2="20"/></svg></div>
-      <h4>Data &amp; Productivity</h4>
-      <ul>
-        <li>Data Analysis &amp; Organization</li>
-        <li>Microsoft Word</li>
-        <li>Microsoft Excel</li>
-        <li>Microsoft PowerPoint</li>
-      </ul>
-    </div>
-    <div class="skill-card reveal" style="grid-column: span 2;">
-      <div class="skill-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="0.9" fill="currentColor" stroke="none"/></svg></div>
-      <h4>Other</h4>
-      <ul>
-        <li>Cybersecurity Fundamentals</li>
-        <li>Risk Awareness</li>
-        <li>Teamwork</li>
-        <li>Communication</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<div class="image-lightbox" id="imageLightbox" aria-hidden="true" role="dialog" aria-modal="true">
-  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close fullscreen image">×</button>
-  <div class="lightbox-content">
-    <img id="lightboxImage" src="" alt="">
-  </div>
-</div>
-
-<!-- ================= CONTACT ================= -->
-<section id="contact" class="wrap scroll-reveal">
-  <div class="contact-panel reveal">
-    <div class="contact-info">
-      <span class="eyebrow">LET'S WORK TOGETHER</span>
-      <h2>Have a project, opportunity, or just want to connect?</h2>
-      <p>Feel free to reach out. I'm always open to new opportunities, collaborations, and learning experiences.</p>
-
-      <div class="contact-line"><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span> <span id="contactEmail">balagtasreignkerstine@gmail.com</span></div>
-      <div class="contact-line"><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1.2 1.2 0 011.2-.3c1.2.4 2.5.6 3.8.6.7 0 1.2.5 1.2 1.2V20c0 .7-.5 1.2-1.2 1.2C11.2 21.2 2.8 12.8 2.8 3.6c0-.7.5-1.2 1.2-1.2h3.3c.7 0 1.2.5 1.2 1.2 0 1.3.2 2.6.6 3.8.1.4 0 .9-.3 1.2L6.6 10.8z"/></svg></span> <span id="contactPhone">+63 993 568 9386</span></div>
-
-      <div class="social-row" id="socialRow">
-        <a href="mailto:balagtasreignkerstine@gmail.com" aria-label="Email">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-        </a>
-        <a href="https://www.facebook.com/rk.balagtas" id="fbLink" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 8.5h2V5.2c-.3 0-1.5-.2-2.8-.2-2.8 0-4.7 1.7-4.7 4.9v2.6H6.8V16h2.7v8h3.3v-8h2.7l.4-3.5h-3.1V10c0-1 .3-1.5 1.2-1.5z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/arkeycs/" id="igLink" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg>
-        </a>
-      </div>
-    </div>
-
-    <form class="contact-form" id="contactForm">
-      <div class="form-row">
-        <div class="field">
-          <label for="cf-name">Your name</label>
-          <input type="text" id="cf-name" name="name" required>
-        </div>
-        <div class="field">
-          <label for="cf-email">Your email</label>
-          <input type="email" id="cf-email" name="email" required>
-        </div>
+<!-- ================= LOGIN VIEW ================= -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <h1>Admin Login</h1>
+    <p>Sign in to edit the portfolio content.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="lg-user">Username</label>
+        <input type="text" id="lg-user" autocomplete="username" required>
       </div>
       <div class="field">
-        <label for="cf-message">Tell me about your project</label>
-        <textarea id="cf-message" name="message" rows="5" required></textarea>
+        <label for="lg-pass">Password</label>
+        <input type="password" id="lg-pass" autocomplete="current-password" required>
       </div>
-      <button type="submit" class="btn btn-primary" id="cf-submit">Send Message →</button>
-      <div class="form-msg" id="cf-msg"></div>
+      <button class="btn btn-primary" type="submit">Log In</button>
+      <div class="login-err" id="loginErr"></div>
     </form>
   </div>
-</section>
+</div>
 
-<!-- ================= FOOTER ================= -->
-<footer class="scroll-reveal">
-  <div class="wrap">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <strong id="footerName">Reign Kerstine A. Balagtas</strong>
-        <span id="footerTagline">IT Graduate | System Analyst | UI/UX Enthusiast</span>
-      </div>
-      <div class="footer-social">
-        <a href="https://www.facebook.com/rk.balagtas" id="footerFb">Facebook</a>
-        <span>•</span>
-        <a href="https://www.instagram.com/arkeycs/" id="footerIg">Instagram</a>
-        <span>•</span>
-        <a href="mailto:balagtasreignkerstine@gmail.com" id="footerEmail">Email</a>
-      </div>
-    </div>
-    <div class="footer-copy" id="footerCopy">© 2026 Reign Kerstine A. Balagtas. All Rights Reserved.</div>
+<!-- ================= DASHBOARD VIEW ================= -->
+<div class="admin-shell" id="dashboardView" style="display:none;">
+  <div class="admin-header">
+    <h1>Portfolio Settings</h1>
+    <button class="logout-btn" id="logoutBtn">Log Out</button>
   </div>
-</footer>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="about">About</button>
+    <button class="tab-btn" data-tab="projects">Projects</button>
+    <button class="tab-btn" data-tab="skills">Skills</button>
+    <button class="tab-btn" data-tab="contact">Contact</button>
+    <button class="tab-btn" data-tab="footer">Footer</button>
+    <button class="tab-btn" data-tab="messages">Messages</button>
+  </div>
+
+  <!-- About -->
+  <div class="tab-panel active" data-panel="about">
+    <h2>About Section</h2>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Short intro (hero paragraph)</label>
+      <textarea id="s-about_bio" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label>Longer bio (About section detail)</label>
+      <textarea id="s-about_long" rows="4"></textarea>
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="about">Save Changes</button>
+      <span class="save-status" id="status-about"></span>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="tab-panel" data-panel="projects">
+    <h2>Projects</h2>
+    <div id="projectList"></div>
+    <button class="btn-add" id="addProjectBtn">+ Add Project</button>
+  </div>
+
+  <!-- Skills -->
+  <div class="tab-panel" data-panel="skills">
+    <h2>Skills</h2>
+    <div id="skillCatList"></div>
+    <button class="btn-add" id="addCategoryBtn">+ Add Category</button>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="skills">Save Skills</button>
+      <span class="save-status" id="status-skills"></span>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="tab-panel" data-panel="contact">
+    <h2>Contact Section</h2>
+    <div class="field-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div class="field"><label>Email</label><input type="email" id="s-contact_email"></div>
+      <div class="field"><label>Phone</label><input type="text" id="s-contact_phone"></div>
+      <div class="field"><label>Facebook URL</label><input type="url" id="s-contact_facebook"></div>
+      <div class="field"><label>Instagram URL</label><input type="url" id="s-contact_instagram"></div>
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="contact">Save Changes</button>
+      <span class="save-status" id="status-contact"></span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="tab-panel" data-panel="footer">
+    <h2>Footer</h2>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Name</label>
+      <input type="text" id="s-footer_name">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Tagline</label>
+      <input type="text" id="s-footer_tagline">
+    </div>
+    <div class="field">
+      <label>Copyright year</label>
+      <input type="text" id="s-footer_year">
+    </div>
+    <div class="save-row">
+      <button class="btn btn-primary" data-save="footer">Save Changes</button>
+      <span class="save-status" id="status-footer"></span>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="tab-panel" data-panel="messages">
+    <h2>Messages from Contact Form</h2>
+    <div id="messagesList" style="color:var(--text-2); font-size:0.9rem;">Loading…</div>
+  </div>
+</div>
 
 <script src="config.js"></script>
-<script src="script.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>
